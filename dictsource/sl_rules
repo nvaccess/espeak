@@ -4,6 +4,7 @@
 
 .L01 b d g j l m n v z ž   // voiced consonants
 
+.L03 a e
 .L04 l v
 
 
@@ -12,6 +13,8 @@
         a (X$w_alt3+  'a
 
         a (č_    'a:
+        a (l_    'a:
+        
 
 .group b
         b        b
@@ -60,8 +63,10 @@
         i (X$w_alt3+  'i
         i (A     j
         
-     @) i (ja_   =i
-     r) i (ja_   i:
+     @) i (jL03_   =i
+     r) i (jL03_   i:
+     z) i (jL03_   i:
+        i (l_    'i:
 
 .group j
         j        j
@@ -110,6 +115,7 @@
         o (L04+  o:
 
         o (č_    'o:
+        o (l_    'o:
         
 .group p
         p        p
