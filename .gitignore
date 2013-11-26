@@ -1,0 +1,9 @@
+dictsource/dict_log
+dictsource/dict_phonemes
+espeak-data/*_dict
+espeak-data/intonations
+espeak-data/phon*
+phsource/compile_*
+phsource/envelopes.png
+phsource/error_*
+phsource/vowelcharts
