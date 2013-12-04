@@ -990,6 +990,10 @@ static wxString CompileAllDictionaries()
 
 	sprintf(fname_log,"%s%s",path_dsource,"dict_log");
 	log = fopen(fname_log,"w");
+	if(log != 0)
+	{
+		fprintf(log, "%s", utf8_bom);
+	}
 	sprintf(fname_log,"%s%s",path_dsource,"dict_phonemes");
 	f_phused = fopen(fname_log,"w");
 
@@ -1638,6 +1642,12 @@ int LoadSpect(const char *path, int control)
 		return(0);
 	}
 	spectseq->Load(stream);
+
+	if(spectseq->frames == NULL)
+	{
+		error("Bad vowel file, no frames: '%s'",path);
+		return(0);
+	}
 
 	// do we need additional klatt data ?
 	for(frame=0; frame < spectseq->numframes; frame++)
@@ -2401,6 +2411,9 @@ int CompileIf(int elif)
 		else
 		{
 			error("Unexpected keyword '%s'",item_string);
+
+			if((strcmp(item_string, "phoneme") == 0) || (strcmp(item_string, "endphoneme") == 0))
+				return(-1);
 		}
 
 		// output the word
@@ -3615,6 +3628,11 @@ make_envs();
 "#  Address  Data file\n"
 "#  -------  ---------\n");
 
+
+	fprintf(f_errors, "Source data path = '%s'\n", path_source);
+	strncpy0(fname,path_phfile.mb_str(wxConvLocal),sizeof(fname));
+	fprintf(f_errors, "Master phonemes file = '%s'\n", fname);
+	fprintf(f_errors, "Output to '%s/'\n\n", path_home);
 
 	sprintf(fname,"%s/%s",path_home,"phondata");
 	f_phdata = fopen_log(f_errors,fname,"wb");

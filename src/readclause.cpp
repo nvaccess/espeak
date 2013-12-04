@@ -1259,7 +1259,7 @@ static const char *VoiceFromStack()
 
 
 
-static void ProcessParamStack(char *outbuf, int &outix)
+static void ProcessParamStack(char *outbuf, int *outix)
 {//====================================================
 // Set the speech parameters from the parameter stack
 	int param;
@@ -1308,8 +1308,8 @@ static void ProcessParamStack(char *outbuf, int &outix)
 			}
 
 			speech_parameters[param] = new_parameters[param];
-			strcpy(&outbuf[outix],buf);
-			outix += strlen(buf);
+			strcpy(&outbuf[*outix],buf);
+			*outix += strlen(buf);
 		}
 	}
 }  // end of ProcessParamStack
@@ -1333,7 +1333,7 @@ static PARAM_STACK *PushParamStack(int tag_type)
 }  //  end of PushParamStack
 
 
-static void PopParamStack(int tag_type, char *outbuf, int &outix)
+static void PopParamStack(int tag_type, char *outbuf, int *outix)
 {//==============================================================
 	// unwind the stack up to and including the previous tag of this type
 	int ix;
@@ -1503,10 +1503,14 @@ static int attr_prosody_value(int param_type, const wchar_t *pw, int *value_out)
 
 	if((tail[0]=='s') && (tail[1]=='t'))
 	{
+#ifdef PLATFORM_RISCOS
+		*value_out = 100;
+#else
 		double x;
 		// convert from semitones to a  frequency percentage
-		x = pow(double(2.0),double((value*sign)/12)) * 100;
+		x = pow((double)2.0,(double)((value*sign)/12)) * 100;
 		*value_out = (int)x;
+#endif
 		return(2);   // percentage
 	}
 
@@ -1596,6 +1600,7 @@ static int GetVoiceAttributes(wchar_t *pw, int tag_type)
 	wchar_t *name;
 	wchar_t *age;
 	wchar_t *variant;
+	int value;
 	const char *new_voice_id;
 	SSML_STACK *ssml_sp;
 
@@ -1641,7 +1646,9 @@ static int GetVoiceAttributes(wchar_t *pw, int tag_type)
 
 		attrcopy_utf8(ssml_sp->language,lang,sizeof(ssml_sp->language));
 		attrcopy_utf8(ssml_sp->voice_name,name,sizeof(ssml_sp->voice_name));
-		ssml_sp->voice_variant_number = attrnumber(variant,1,0)-1;
+		if((value = attrnumber(variant,1,0)) > 0)
+			value--;    // variant='0' and variant='1' the same
+		ssml_sp->voice_variant_number = value;
 		ssml_sp->voice_age = attrnumber(age,0,0);
 		ssml_sp->voice_gender = attrlookup(gender,mnem_gender);
 		ssml_sp->tag_type = tag_type;
@@ -1731,7 +1738,7 @@ static void SetProsodyParameter(int param_type, wchar_t *attr1, PARAM_STACK *sp)
 }  // end of SetProsodyParemeter
 
 
-static int ReplaceKeyName(char *outbuf, int index, int &outix)
+static int ReplaceKeyName(char *outbuf, int index, int *outix)
 {//===========================================================
 // Replace some key-names by single characters, so they can be pronounced in different languages
 	static MNEM_TAB keynames[] = {
@@ -1750,14 +1757,14 @@ static int ReplaceKeyName(char *outbuf, int index, int &outix)
 	if((letter = LookupMnem(keynames, p)) != 0)
 	{
 		ix = utf8_out(letter, p);
-		outix = index + ix;
+		*outix = index + ix;
 		return(letter);
 	}
 	return(0);
 }
 
 
-static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outbuf, int self_closing)
+static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int *outix, int n_outbuf, int self_closing)
 {//==================================================================================================
 // xml_buf is the tag and attributes with a zero terminator in place of the original '>'
 // returns a clause terminator value.
@@ -1842,7 +1849,7 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 		// closing tag
 		if((tag_type = LookupMnem(ssmltags,&tag_name[1])) != HTML_NOSPACE)
 		{
-			outbuf[outix++] = ' ';
+			outbuf[(*outix)++] = ' ';
 		}
 		tag_type += SSML_CLOSE;
 	}
@@ -1851,7 +1858,7 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 		if((tag_type = LookupMnem(ssmltags,tag_name)) != HTML_NOSPACE)
 		{
 			// separate SSML tags from the previous word (but not HMTL tags such as <b> <font> which can occur inside a word)
-			outbuf[outix++] = ' ';
+			outbuf[(*outix)++] = ' ';
 		}
 
 		if(self_closing && ignore_if_self_closing[tag_type])
@@ -1951,22 +1958,22 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 		}
 
 		sprintf(buf,"%c%dY",CTRL_EMBEDDED,value);
-		strcpy(&outbuf[outix],buf);
-		outix += strlen(buf);
+		strcpy(&outbuf[*outix],buf);
+		*outix += strlen(buf);
 
-		sayas_start = outix;
+		sayas_start = *outix;
 		sayas_mode = value;   // punctuation doesn't end clause during SAY-AS
 		break;
 
 	case SSML_SAYAS + SSML_CLOSE:
 		if(sayas_mode == SAYAS_KEY)
 		{
-			outbuf[outix] = 0;
+			outbuf[*outix] = 0;
 			ReplaceKeyName(outbuf, sayas_start, outix);
 		}
 
-		outbuf[outix++] = CTRL_EMBEDDED;
-		outbuf[outix++] = 'Y';
+		outbuf[(*outix)++] = CTRL_EMBEDDED;
+		outbuf[(*outix)++] = 'Y';
 		sayas_mode = 0;
 		break;
 
@@ -1975,7 +1982,7 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 		{
 			// use the alias  rather than the text
 			ignore_text = 1;
-			outix += attrcopy_utf8(&outbuf[outix],attr1,n_outbuf-outix);
+			*outix += attrcopy_utf8(&outbuf[*outix],attr1,n_outbuf-*outix);
 		}
 		break;
 
@@ -2005,8 +2012,8 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 			if((index = AddNameData(buf,0)) >= 0)
 			{
 				sprintf(buf,"%c%dM",CTRL_EMBEDDED,index);
-				strcpy(&outbuf[outix],buf);
-				outix += strlen(buf);
+				strcpy(&outbuf[*outix],buf);
+				*outix += strlen(buf);
 			}
 		}
 		break;
@@ -2033,8 +2040,8 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 				if(index >= 0)
 				{
 					sprintf(buf,"%c%dI",CTRL_EMBEDDED,index);
-					strcpy(&outbuf[outix],buf);
-					outix += strlen(buf);
+					strcpy(&outbuf[*outix],buf);
+					*outix += strlen(buf);
 					sp->parameter[espeakSILENCE] = 1;
 				}
 			}
@@ -2046,8 +2053,8 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 					if(uri_callback(1,uri,xmlbase) == 0)
 					{
 						sprintf(buf,"%c%dU",CTRL_EMBEDDED,index);
-						strcpy(&outbuf[outix],buf);
-						outix += strlen(buf);
+						strcpy(&outbuf[*outix],buf);
+						*outix += strlen(buf);
 						sp->parameter[espeakSILENCE] = 1;
 					}
 				}
@@ -2077,8 +2084,8 @@ static int ProcessSsmlTag(wchar_t *xml_buf, char *outbuf, int &outix, int n_outb
 			if(value < 3)
 			{
 				// adjust prepause on the following word
-				sprintf(&outbuf[outix],"%c%dB",CTRL_EMBEDDED,value);
-				outix += 3;
+				sprintf(&outbuf[*outix],"%c%dB",CTRL_EMBEDDED,value);
+				*outix += 3;
 				terminator = 0;
 			}
 			value = break_value[value];
@@ -2288,7 +2295,7 @@ f_input = f_in;  // for GetC etc
 				return(CLAUSE_EOF);
 			}
 
-			if((skip_characters > 0) && (count_characters > skip_characters))
+			if((skip_characters > 0) && (count_characters >= skip_characters))
 			{
 				// reached the specified start position
 				// don't break a word
@@ -2425,7 +2432,7 @@ f_input = f_in;  // for GetC etc
 						self_closing = 1;
 					}
 
-					terminator = ProcessSsmlTag(xml_buf,buf,ix,n_buf,self_closing);
+					terminator = ProcessSsmlTag(xml_buf,buf,&ix,n_buf,self_closing);
 
 					if(terminator != 0)
 					{

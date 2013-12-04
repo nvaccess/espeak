@@ -1928,6 +1928,20 @@ include ph_telugu
 phonemetable si hi
 include ph_sinhala
 
+phonemetable gu hi
+include ph_gujarati
+
+phonemetable as bn
+include ph_assamese
+
+phonemetable or bn
+include ph_oriya
+
+phonemetable mni bn
+include ph_manipuri
+
+
+
 phonemetable tn base
 include ph_setswana
 
@@ -1950,3 +1964,6 @@ include ph_korean
 phonemetable kl base
 include ph_greenlandic
 
+
+//phonemetable en2 en
+//include ph_english_test

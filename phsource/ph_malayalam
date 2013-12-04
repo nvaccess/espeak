@@ -15,7 +15,7 @@ phoneme y  // epenthetic vowel
   unstressed
   ipa ɨ
   length 80
-  FMT(vowel/u#_4, 80)
+  FMT(vowel/u#_4, 120)
 endphoneme
 
 
@@ -273,6 +273,47 @@ phoneme g#
     WAV(ustop/k_asp_a, 25)
   ELSE
     WAV(ustop/k_asp_a, 30)
+  ENDIF
+endphoneme
+
+
+
+// suggested by Prasenjit Sen, but perhaps not needed?
+// ml_rules changes [p], [t], [k] to [b], [d], [g] in non-initial
+// positions
+
+phoneme p
+  import_phoneme consonants/p-
+  voicingswitch b
+
+  IF thisPh(isWordStart) THEN
+      CALL base/p
+  ELIF thisPh(isWordEnd) AND NOT thisPh(isFirstVowel) THEN
+      ChangePhoneme(b)
+  ENDIF
+endphoneme
+
+
+phoneme t 
+  import_phoneme base/t[
+  voicingswitch d
+
+  IF thisPh(isWordStart) THEN
+      CALL base/t
+  ELIF thisPh(isWordEnd) AND NOT thisPh(isFirstVowel) THEN
+      ChangePhoneme(d)
+  ENDIF
+endphoneme
+
+
+phoneme k
+  import_phoneme consonants/k-
+  voicingswitch g
+
+  IF thisPh(isWordStart) THEN
+      CALL base/k
+  ELIF thisPh(isWordEnd) AND NOT thisPh(isFirstVowel) THEN
+      ChangePhoneme(g)
   ENDIF
 endphoneme
 
