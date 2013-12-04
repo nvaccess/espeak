@@ -34,11 +34,7 @@
 #define ESPEAK_API
 #endif
 
-<<<<<<< HEAD
-#define ESPEAK_API_REVISION  6
-=======
 #define ESPEAK_API_REVISION  9
->>>>>>> 035af243492fe6b6ca8f8f87838e1e439bad1366
 /*
 Revision 2
    Added parameter "options" to eSpeakInitialize()
@@ -54,8 +50,6 @@ Revision 5
 
 Revision 6
   Added macros: espeakRATE_MINIMUM, espeakRATE_MAXIMUM, espeakRATE_NORMAL
-<<<<<<< HEAD
-=======
 
 Revision 7  24.Dec.2011
   Changed espeak_EVENT structure to add id.string[] for phoneme mnemonics.
@@ -67,7 +61,6 @@ Revision 8  26.Apr.2013
 Revision 9  30.May.2013
   Changed function espeak_TextToPhonemes().
 
->>>>>>> 035af243492fe6b6ca8f8f87838e1e439bad1366
 */
          /********************/
          /*  Initialization  */
@@ -183,10 +176,7 @@ typedef enum {
 } espeak_ERROR;
 
 #define espeakINITIALIZE_PHONEME_EVENTS 0x0001
-<<<<<<< HEAD
-=======
 #define espeakINITIALIZE_PHONEME_IPA   0x0002
->>>>>>> 035af243492fe6b6ca8f8f87838e1e439bad1366
 #define espeakINITIALIZE_DONT_EXIT     0x8000
 
 #ifdef __cplusplus
@@ -203,10 +193,7 @@ ESPEAK_API int espeak_Initialize(espeak_AUDIO_OUTPUT output, int buflength, cons
    path: The directory which contains the espeak-data directory, or NULL for the default location.
 
    options: bit 0:  1=allow espeakEVENT_PHONEME events.
-<<<<<<< HEAD
-=======
             bit 1:  1= espeakEVENT_PHONEME events give IPA phoneme names, not eSpeak phoneme names
->>>>>>> 035af243492fe6b6ca8f8f87838e1e439bad1366
             bit 15: 1=don't exit if espeak_data is not found (used for --help)
 
    Returns: sample rate in Hz, or -1 (EE_INTERNAL_ERROR).
@@ -385,11 +372,7 @@ ESPEAK_API espeak_ERROR espeak_Key(const char *key_name);
 extern "C"
 #endif
 ESPEAK_API espeak_ERROR espeak_Char(wchar_t character);
-<<<<<<< HEAD
-/* Speak the name of the given character 
-=======
 /* Speak the name of the given character
->>>>>>> 035af243492fe6b6ca8f8f87838e1e439bad1366
 
    Return: EE_OK: operation achieved
            EE_BUFFER_FULL: the command can not be buffered;
@@ -506,8 +489,6 @@ ESPEAK_API void espeak_SetPhonemeTrace(int value, FILE *stream);
 #ifdef __cplusplus
 extern "C"
 #endif
-<<<<<<< HEAD
-=======
 ESPEAK_API const char *espeak_TextToPhonemes(const void **textptr, int textmode, int phonememode);
 /* Translates text into phonemes.  Call espeak_SetVoiceByName() first, to select a language.
 
@@ -539,7 +520,6 @@ ESPEAK_API const char *espeak_TextToPhonemes(const void **textptr, int textmode,
 #ifdef __cplusplus
 extern "C"
 #endif
->>>>>>> 035af243492fe6b6ca8f8f87838e1e439bad1366
 ESPEAK_API void espeak_CompileDictionary(const char *path, FILE *log, int flags);
 /* Compile pronunciation dictionary for a language which corresponds to the currently
    selected voice.  The required voice should be selected before calling this function.

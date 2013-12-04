@@ -11,6 +11,10 @@ The  src  directory contains a makefile that produces:
     This is a shared library which contains the text to speech engine.
     Its API is described in the file "speak_bin.h".
 
+    If you copy libespeak into /usr/lib/ manually (rather than doing
+    "make install"), then do the command "ldconfig" to set the link
+    from libespeak.so to libespeak.so.1.xx
+
 2.  "espeak" binary.  This is a small command-line program which is a front
     end to the libespeak library, which it needs.
 
@@ -50,14 +54,3 @@ where ** is the language code (eg. en for English).
 In order to modify the sounds or other characteristics of phonemes, or
 to add additional phonemes, another program "espeakedit" is needed. This
 is provided in a separate package.
-
-
-PowerPC and Big-Endian Processors
-=================================
-
-The compiled data in the espeak-data directory is not binary compatible between
-processors with different byte ordering.  For a PowerPC or other big-endian
-processor use must use data which has been compiled (using espeakedit) on
-a big-endian processor.
-
-
