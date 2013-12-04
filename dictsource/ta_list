@@ -85,8 +85,8 @@ _;	a:raIb||pul.l.i	// ஆரைப் புள்ளி
 _:	mukka:l||pul.l.i	// முக்கால் புள்ளி
 _(	id.V||piRaI	// இட பிறை
 _)	vVlV||piRaI       // வல பிறை
-_[	id.V||sadUrVm	// இட சதுரம்
-_]	vVlV||sadUrVm	// வல சதுரம்
+_[	id.VppVgVrVm	// இடப்பகரம்  
+_]	vVlVppVgVrVm	// வலப்பகரம். 
 _{	id.V||gVn.Vm	// இட கணம்
 _}	vVlV||gVn.Vm	// வல கணம்
 <	kuRaIvU		// குறைவு
@@ -206,7 +206,7 @@ _1M3	orUko:d.ie:
 
 _dpt	_pul.l.i
 
-// drop final [U] when followed by an ordinal suffix
+// drop final [U] when followed by an ordinal suffix or thousands
 _1o	onR
 _2o	irVn.d.
 _3o	mu:nR
@@ -239,17 +239,29 @@ _6Co	aRUnu:R
 _7Co	;ez.Unu:R
 _8Co	;en.n.u:R
 
+
+
 _#ம்	a:m  // ordinal suffix
 _#ல்	il
 _#வது	a:vVdU
 _#வதும்	a:vVdUm
 _#வதுமாக a:vVdUma:gV
 
+_#ஆம்	a:m  // including ஆ
+_#ஆவது	a:vVdU
+_#ஆவதும்	a:vVdUm
+_#ஆவதுமாக a:vVdUma:gV
+
 _#-ம்	a:m  // ordinal suffix with hyphen
 _#-ல்	il
 _#-வது	a:vVdU
 _#-வதும்	a:vVdUm
 _#-வதுமாக a:vVdUma:gV
+
+_#-ஆம்	a:m  // including ஆ
+_#-ஆவது	a:vVdU
+_#-ஆவதும்	a:vVdUm
+_#-ஆவதுமாக a:vVdUma:gV
 
 // English words
 tamil	தமிழ்	$text
@@ -270,8 +282,6 @@ tamil	தமிழ்	$text
 போகம்	$alt
 போதனை	$alt
 பூகம்பம்	$alt
-பாகவதம்	$alt
-பகவத்	$alt
 பங்கம்	$alt
 பேகம்	$alt
 பார்லி	$alt
@@ -387,6 +397,9 @@ tamil	தமிழ்	$text
 புசு 	$alt
 புஸு	$alt
 பாதிக்காம	$alt
+பனியா	$alt
+பாம்	$alt
+போத 	$alt
 
 
 	// initial த as [d]
@@ -454,6 +467,7 @@ tamil	தமிழ்	$text
 தாயம்	$alt
 திமு	$alt
 தாவா	$alt
+துருவா	$alt
 
 
 	// initial ட
@@ -464,6 +478,7 @@ tamil	தமிழ்	$text
 	// initial ச as [tS]
 சீ		$alt
 சே		$alt
+சே	s'e:	$hasdot
 சீசீ	tSi:tSi: 
 சீச்சீ 		$alt
 சிட்டாய் 		$alt
@@ -491,7 +506,6 @@ tamil	தமிழ்	$text
 கயா	$alt
 காயத்ரி	$alt
 கட	$alt
-கோ	$alt
 கதி	$alt
 கோபி 	$alt
 கச்சாமி	$alt
@@ -548,7 +562,6 @@ tamil	தமிழ்	$text
 போன்	fo:n
 போனில்	fo:nil
 //பைலை 	faIlaI
-பாதர்	fa:dVr
 பாதரிடம்	fa:dVrid.Vm
 பாதருடன்	fa:dVrUd.Vn
 பாதரில்லாமல்	fa:dVrilla:mVl
@@ -573,3 +586,4 @@ tamil	தமிழ்	$text
 பிட்	bit.
 புட்	fud.
 உப்ப	ubbV
+ஜென்	zen
