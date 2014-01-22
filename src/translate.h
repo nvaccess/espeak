@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 to 2013 by Jonathan Duddington                     *
+ *   Copyright (C) 2005 to 2014 by Jonathan Duddington                     *
  *   email: jonsd@users.sourceforge.net                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -117,6 +117,7 @@
 #define FLAG_DELETE_WORD     0x100000   // don't speak this word, it has been spoken as part of the previous word
 #define FLAG_CHAR_REPLACED   0x200000   // characters have been replaced by .replace in the *_rules
 #define FLAG_TRANSLATOR2     0x400000   // retranslating using a different language
+#define FLAG_PREFIX_REMOVED  0x800000   // a prefix has been removed from this word
 
 #define FLAG_SUFFIX_VOWEL  0x08000000   // remember an initial vowel from the suffix
 #define FLAG_NO_TRACE      0x10000000   // passed to TranslateRules() to suppress dictionary lookup printout
@@ -533,6 +534,7 @@ typedef struct {
 	int decimal_sep;
 	int max_digits;    // max number of digits which can be spoken as an integer number (rather than individual digits)
 	const char *ordinal_indicator;   // UTF-8 string
+	const char *roman_suffix;    // add this (ordinal) suffix to Roman numbers (LANG=an)
 
 	// bit 0, accent name before the letter name, bit 1 "capital" after letter name
 	int accents;
@@ -722,6 +724,7 @@ int IsDigit(unsigned int c);
 int IsDigit09(unsigned int c);
 int IsAlpha(unsigned int c);
 int IsVowel(Translator *tr, int c);
+int IsSuperscript(int letter);
 int iswalpha2(int c);
 int isspace2(unsigned int c);
 int iswlower2(int c);
@@ -736,6 +739,7 @@ ALPHABET *AlphabetFromName(const char *name);
 Translator *SelectTranslator(const char *name);
 int SetTranslator2(const char *name);
 void DeleteTranslator(Translator *tr);
+void ProcessLanguageOptions(LANGUAGE_OPTIONS *langopts);
 int Lookup(Translator *tr, const char *word, char *ph_out);
 int LookupFlags(Translator *tr, const char *word);
 
