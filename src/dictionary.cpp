@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 to 2013 by Jonathan Duddington                     *
+ *   Copyright (C) 2005 to 2014 by Jonathan Duddington                     *
  *   email: jonsd@users.sourceforge.net                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -905,12 +905,19 @@ int Unpronouncable(Translator *tr, char *word, int posn)
 	int  vowel_posn=9;
 	int  index;
 	int  count;
+	ALPHABET *alphabet;
 
 	utf8_in(&c,word);
 	if((tr->letter_bits_offset > 0) && (c < 0x241))
 	{
 		// Latin characters for a language with a non-latin alphabet
 		return(0);  // so we can re-translate the word as English
+	}
+
+	if(((alphabet = AlphabetFromChar(c)) != NULL)  && (alphabet->offset != tr->letter_bits_offset))
+	{
+		// Character is not in our alphabet
+		return(0);
 	}
 
 	if(tr->langopts.param[LOPT_UNPRONOUNCABLE] == 1)
@@ -2157,6 +2164,13 @@ static void MatchRule(Translator *tr, char *word[], char *word_start, int group_
 					if(command == 0x01)
 					{
 						match.end_type = SUFX_UNPRON;    // $unpron
+					}
+					else if(command == 0x02)   // $noprefix
+					{
+						if(word_flags & FLAG_PREFIX_REMOVED)
+							failed = 1;             // a prefix has been removed
+						else
+							add_points = 1;
 					}
 					else if((command & 0xf0) == 0x10)
 					{
@@ -3597,7 +3611,7 @@ int RemoveEnding(Translator *tr, char *word, int end_type, char *word_copy)
 	int end_flags;
 	const char *p;
 	int  len;
-	static char ending[12];
+	char ending[50];
 
 	// these lists are language specific, but are only relevent if the 'e' suffix flag is used
 	static const char *add_e_exceptions[] = {
@@ -3635,7 +3649,7 @@ int RemoveEnding(Translator *tr, char *word, int end_type, char *word_copy)
 	}
 
 	// remove bytes from the end of the word and replace them by spaces
-	for(i=0; i<len_ending; i++)
+	for(i=0; (i<len_ending) && (i < sizeof(ending)-1); i++)
 	{
 		ending[i] = word_end[i];
 		word_end[i] = ' ';
