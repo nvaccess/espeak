@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 to 2013 by Jonathan Duddington                     *
+ *   Copyright (C) 2005 to 2014 by Jonathan Duddington                     *
  *   email: jonsd@users.sourceforge.net                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -851,11 +851,14 @@ Translator *SelectTranslator(const char *name)
 		break;
 
 	case L('g','a'):   // irish
+	case L('g','d'):   // scots gaelic
 		{
 			tr->langopts.stress_rule = STRESSPOSN_1L;
-			tr->langopts.numbers = 1;
+			tr->langopts.stress_flags = S_NO_AUTO_2;  // don't use secondary stress
+			tr->langopts.numbers = NUM_OMIT_1_HUNDRED | NUM_OMIT_1_THOUSAND;
 			tr->langopts.accents = 2;  // 'capital' after letter name
 			tr->langopts.param[LOPT_UNPRONOUNCABLE] = 3;  // don't count apostrophe
+			tr->langopts.param[LOPT_IT_LENGTHEN] = 1;    // remove [:] phoneme from non-stressed syllables (Lang=gd)
 		}
 		break;
 
@@ -1048,7 +1051,7 @@ SetLengthMods(tr,3);  // all equal
 			tr->langopts.unstressed_wd1 = 2;
 			tr->langopts.unstressed_wd2 = 2;
 			tr->langopts.param[LOPT_IT_LENGTHEN] = 2;    // remove lengthen indicator from unstressed or non-penultimate syllables
-			tr->langopts.param[LOPT_IT_DOUBLING] = 2;    // double the first consonant if the previous word ends in a stressed vowel
+			tr->langopts.param[LOPT_IT_DOUBLING] = 1;    // double the first consonant if the previous word ends in a stressed vowel (changed to =1, 23.01.2014 - only use if prev.word has $double)
 			tr->langopts.param[LOPT_SONORANT_MIN] = 130;  // limit the shortening of sonorants before short vowels
 			tr->langopts.param[LOPT_REDUCE] = 1;        // reduce vowels even if phonemes are specified in it_list
 			tr->langopts.param[LOPT_ALT] = 2;      // call ApplySpecialAttributes2() if a word has $alt or $alt2
@@ -1306,8 +1309,9 @@ SetLengthMods(tr,3);  // all equal
 
 			tr->langopts.stress_rule = STRESSPOSN_1R;        // stress on final syllable
 			tr->langopts.stress_flags =  S_FINAL_DIM_ONLY | S_FINAL_NO_2 | S_INITIAL_2 | S_PRIORITY_STRESS;
-			tr->langopts.numbers = NUM_DECIMAL_COMMA | NUM_DFRACTION_2 | NUM_HUNDRED_AND | NUM_AND_UNITS | NUM_ROMAN;
+			tr->langopts.numbers = NUM_DECIMAL_COMMA | NUM_DFRACTION_2 | NUM_HUNDRED_AND | NUM_AND_UNITS | NUM_ROMAN_CAPITALS;
 			tr->langopts.numbers2 = NUM2_MULTIPLE_ORDINAL | NUM2_NO_TEEN_ORDINALS | NUM2_ORDINAL_NO_AND;
+			tr->langopts.max_roman = 5000;
 			SetLetterVowel(tr,'y');
 			ResetLetterBits(tr,0x2);
 			SetLetterBits(tr,1,"bcdfgjkmnpqstvxz");      // B  hard consonants, excluding h,l,r,w,y
@@ -1663,6 +1667,7 @@ SetLengthMods(tr,3);  // all equal
 
 	tr->translator_name = name2;
 
+	ProcessLanguageOptions(&tr->langopts);
 	return(tr);
 }  // end of SelectTranslator
 
