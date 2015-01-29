@@ -1,5 +1,5 @@
-// This file is UTF8 encoded
-
+﻿// This file is UTF8 encoded
+// Improvement work started on July 2014 by Maheshinder Singh Khosla, mahesh.khosla@gmail.com
 // Numbers
 // devanagari numbers are changed to latin characters before translation
 _0        S'u:nj@-
@@ -7,7 +7,7 @@ _1        'e:k
 _2        d'o:
 _3        t'i:n
 _4        c'a:r
-_5        'pa~c
+_5        p'a~c
 _6        c#'VH
 _7        s'a:t
 _8        'a:t.#
@@ -121,7 +121,10 @@ _0M4	'VrVb
 _0M5	k#'VrVb
 _dpt      _d@s@ml'o:_   
 
+
+
 // Single consonants
+
 क      k@
 क़      q@
 ख      k#@
@@ -129,7 +132,7 @@ _dpt      _d@s@ml'o:_
 ग      g@
 ग़      Q@
 घ      g#@
-ङ      N@
+ङ       'Vnga:
 च      c@
 छ      c#@
 ज      J@
@@ -141,12 +144,13 @@ _dpt      _d@s@ml'o:_
 ड      d.@
 ड़      r.@
 ढ      d.#@
-ण      n.@   // retroflex n.@
+ण        an.@-:   // retroflex n.@
 त      t@
 थ      t#@
 द      d@
 ध      d#@
 न      n@
+ऩ	 n'@n'Ukt,a:
 प      p@
 फ      p#@
 फ़      f@
@@ -173,26 +177,26 @@ _dpt      _d@s@ml'o:_
 य़      j@
 
 // combining vowel signs
-ा	#X2a:
-ि	#X1I
-ी	#X2i:
-ु	#X1U
-ू	#X2u:
-ृ	#X1rI
-ॄ	#X1rI
-ॅ	#X1E
-ॆ	#X1e
-े	#X2e:
-ै	#X2E:
-?2 ै	#X2aI
-ॉ	#X1O
-ॊ	#X1o
-ो	#X2o:
-ौ	#X2O:
-?3 ौ 	#X2aU
-ॢ 	#X1l-
-ॣ	#X2l-:
-ॐ	#X1o~m
+//ा	#X2a:
+//ि	#X1I
+//ी	#X2i:
+//ु	#X1U
+//ू	#X2u:
+//ृ	#X1rI
+//ॄ	#X1rI
+//ॅ	#X1E
+//ॆ	#X1e
+//े	#X2e:
+//ै	#X2E:
+//?2 ै	#X2aI
+//ॉ	#X1O
+//ॊ	#X1o
+//ो	#X2o:
+//ौ	#X2O:
+//?3 ौ 	#X2aU
+//ॢ 	#X1l-
+//ॣ	#X2l-:
+//ॐ	#X1o~m
 
 _??	Vks.@r
 
@@ -201,15 +205,26 @@ _ar	'Vrbi
 _cyr	sIrIk'Ik
 _zh	c'i@ni
 
+// Symbols
+ँ	c'Vndr@-b'IndU
+ं	 Vn'Usv@r
+ः	 wIs'VRg
+़	 n'Ukt,a:
+ऽ	 Vv'Vgr@2H
+॑	 Ud'a:t
+॒	 'VnUdata:
+
+
 // Punctuation
-।	dVn.d.V
+।	 p'u:rnwI*'a:m
+॥	 d'i:*g@wI*'a:m
 
 $	dOl@r
 %	pVt'IS@t
 +	plVs
 =	bVr'a:b@r
 *	ta:r'a:Nk@n
-* 
+
 
 // Pronouns
 मैं 	$u	// main: IrI

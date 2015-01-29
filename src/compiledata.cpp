@@ -121,6 +121,7 @@ static keywtab_t k_properties[] = {
 	{"isNasal",      0,  phNASAL},
 	{"isLiquid",     0,  phLIQUID},
 	{"isUStop",      0,  phSTOP},
+	{"isVStop",      0,  phVSTOP},
 	{"isVFricative", 0,  phVFRICATIVE},
 
 	{"isPalatal",    0,  i_isPalatal},
@@ -212,7 +213,7 @@ enum {
 	kTUNE_SPLIT,
 };
 
-static const char utf8_bom[] = {0xef,0xbb,0xbf,0};
+static unsigned const char utf8_bom[] = {0xef,0xbb,0xbf,0};
 
 static keywtab_t k_intonation[] = {
 	{"tune",      0,   kTUNE},
@@ -254,7 +255,7 @@ static keywtab_t keywords[] = {
 	{"phonemenumber",tSTATEMENT, kPHONEMENUMBER},
 	{"phonemetable",tSTATEMENT, kPHONEMETABLE},
 	{"include",     tSTATEMENT, kINCLUDE},
-	{utf8_bom,      tSTATEMENT, kUTF8_BOM},
+	{(const char *)utf8_bom,      tSTATEMENT, kUTF8_BOM},
 
 	{"phoneme",    tSTATEMENT, kPHONEMESTART},
 	{"procedure",  tSTATEMENT, kPROCEDURE},
@@ -322,6 +323,7 @@ static keywtab_t keywords[] = {
 	{"vowel2",     tPHONEME_FLAG, phVOWEL2},
 	{"palatal",    tPHONEME_FLAG, phPALATAL},
 	{"long",       tPHONEME_FLAG, phLONG},
+	{"dontlist",   tPHONEME_FLAG, phDONTLIST},
 	{"brkafter",   tPHONEME_FLAG, phBRKAFTER},
 	{"rhotic",     tPHONEME_FLAG, phRHOTIC},
 	{"nonsyllabic",tPHONEME_FLAG, phNONSYLLABIC},
@@ -923,6 +925,9 @@ static void PrintPhonemesUsed(FILE *f, const char *dsource, const char *dictname
 	for(ix=0; ix<n_ph; ix++)
 	{
 		ph = ph_tab[ix];
+
+		if(ph->phflags & phDONTLIST)  // "dontlist" attribute
+			continue;
 
 		if(ph->type > 1)
 		{
@@ -3497,6 +3502,11 @@ static void CompilePhonemeFiles()
 				f_in = f;
 				strncpy0(current_fname,item_string,sizeof(current_fname));
 				linenum = 1;
+
+			}
+			else
+			{
+				error("Missing file: %s", item_string);
 			}
 			break;
 

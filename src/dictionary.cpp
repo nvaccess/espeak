@@ -527,7 +527,7 @@ unsigned short ipa1[96] = {
 
 #define N_PHON_OUT  500  // realloc increment
 static char *phon_out_buf = NULL;   // passes the result of GetTranslatedPhonemeString()
-static int phon_out_size = 0;
+static unsigned int phon_out_size = 0;
 
 
 char *WritePhMnemonic(char *phon_out, PHONEME_TAB *ph, PHONEME_LIST *plist, int use_ipa, int *flags)
@@ -637,8 +637,11 @@ const char *GetTranslatedPhonemeString(int phoneme_mode)
 	/* Called after a clause has been translated into phonemes, in order
 	   to display the clause in phoneme mnemonic form.
 
-	   phoneme_mode  bits 0-3: 0=only phoneme names, 1=ties, 2=ZWJ, 3=underscore separator
-	                 bit  4:   0=eSpeak phoneme names, 1=IPA
+	   phoneme_mode
+	                 bit  1:   use IPA phoneme names
+	                 bit  7:   use tie between letters in multi-character phoneme names
+	                 bits 8-23 tie or separator character
+
 	*/
 
 	int  ix;
@@ -652,16 +655,12 @@ const char *GetTranslatedPhonemeString(int phoneme_mode)
 	int flags;
 	int use_ipa;
 	int use_tie;
-	int separate_phonemes = 0;
+	int separate_phonemes;
 	char phon_buf[30];
 	char phon_buf2[30];
 	PHONEME_LIST *plist;
 
 	static const char *stress_chars = "==,,''";
-	static const int char_tie[] = {0x0361, 0x200d};  // combining-double-inverted-breve, zero-width-joiner
-
-	use_ipa = phoneme_mode & 0x10;
-	use_tie = phoneme_mode & 0x0f;
 
 	if(phon_out_buf == NULL)
 	{
@@ -673,10 +672,15 @@ const char *GetTranslatedPhonemeString(int phoneme_mode)
 		}
 	}
 
-	if(use_tie >= 3)
+	use_ipa = phoneme_mode & espeakPHONEMES_IPA;
+	if(phoneme_mode & espeakPHONEMES_TIE)
 	{
-		// separate individual phonemes with underscores
-		separate_phonemes = '_';
+		use_tie = phoneme_mode >> 8;
+		separate_phonemes = 0;
+	}
+	else
+	{
+		separate_phonemes = phoneme_mode >> 8;
 		use_tie = 0;
 	}
 
@@ -690,14 +694,15 @@ const char *GetTranslatedPhonemeString(int phoneme_mode)
 		WritePhMnemonic(phon_buf2, plist->ph, plist, use_ipa, &flags);
 		if(plist->newword)
 			*buf++ = ' ';
-		else
+
+		if((!plist->newword) || (separate_phonemes == ' '))
 		{
 			if((separate_phonemes != 0) && (ix > 1))
 			{
 				utf8_in(&c, phon_buf2);
 				if((c < 0x2b0) || (c > 0x36f))  // not if the phoneme starts with a superscript letter
 				{
-					*buf++ = separate_phonemes;
+					buf += utf8_out(separate_phonemes, buf);
 				}
 			}
 		}
@@ -734,12 +739,12 @@ const char *GetTranslatedPhonemeString(int phoneme_mode)
 		for(p=phon_buf2; *p != 0;)
 		{
 			p += utf8_in(&c, p);
-			if(use_tie > 0)
+			if(use_tie != 0)
 			{
 				// look for non-inital alphabetic character, but not diacritic, superscript etc.
 				if((count>0) && !(flags & (1 << (count-1))) && ((c < 0x2b0) || (c > 0x36f)) && iswalpha2(c))
 				{
-					buf += utf8_out(char_tie[use_tie-1], buf);
+					buf += utf8_out(use_tie, buf);
 				}
 			}
 			buf += utf8_out(c, buf);
@@ -1186,6 +1191,7 @@ void SetWordStress(Translator *tr, char *output, unsigned int *dictionary_flags,
    If 'tonic' is set (>= 0), replace highest stress by this value.
 
   control:  bit 0   This is an individual symbol, not a word
+            bit 1   Suffix phonemes are still to be added
 */
 
 	unsigned char phcode;
@@ -1193,6 +1199,7 @@ void SetWordStress(Translator *tr, char *output, unsigned int *dictionary_flags,
 	PHONEME_TAB *ph;
 	int  stress;
 	int  max_stress;
+	int  max_stress_input;  // any stress specified in the input?
 	int  vowel_count;      // num of vowels + 1
 	int  ix;
 	int  v;
@@ -1257,7 +1264,7 @@ void SetWordStress(Translator *tr, char *output, unsigned int *dictionary_flags,
 		unstressed_word = 1;
 	}
 
-	max_stress = GetVowelStress(tr, phonetic, vowel_stress, &vowel_count, &stressed_syllable, 1);
+	max_stress = max_stress_input = GetVowelStress(tr, phonetic, vowel_stress, &vowel_count, &stressed_syllable, 1);
 	if((max_stress < 0) && dictionary_flags)
 	{
 		max_stress = 0;
@@ -1338,34 +1345,33 @@ void SetWordStress(Translator *tr, char *output, unsigned int *dictionary_flags,
 			{
 				stressed_syllable = vowel_count - 2;
 
-				if(stressflags & (S_FINAL_SPANISH | S_FINAL_STRESS_C))
+				if(stressflags & S_FINAL_SPANISH)
 				{
 					// LANG=Spanish, stress on last vowel if the word ends in a consonant other than 'n' or 's'
 					if(phoneme_tab[final_ph]->type != phVOWEL)
 					{
-						if(stressflags & S_FINAL_STRESS_C)
+						mnem = phoneme_tab[final_ph]->mnemonic;
+
+						if(tr->translator_name == L('a','n'))
 						{
-							stressed_syllable = vowel_count - 1;
+							if(((mnem != 's') && (mnem !='n')) || phoneme_tab[final_ph2]->type != phVOWEL)
+								stressed_syllable = vowel_count - 1;   // stress on last syllable
+						}
+						else
+						if(tr->translator_name == L('i','a'))
+						{
+							if((mnem != 's') || phoneme_tab[final_ph2]->type != phVOWEL)
+								stressed_syllable = vowel_count - 1;   // stress on last syllable
 						}
 						else
 						{
-							mnem = phoneme_tab[final_ph]->mnemonic;
-
-							if(tr->translator_name == L('a','n'))
+							if((mnem == 's') && (phoneme_tab[final_ph2]->type == phNASAL))
 							{
-								if(((mnem != 's') && (mnem !='n')) || phoneme_tab[final_ph2]->type != phVOWEL)
-									stressed_syllable = vowel_count - 1;   // stress on last syllable
+								// -ns  stress remains on penultimate syllable
 							}
-							else
+							else if(((phoneme_tab[final_ph]->type != phNASAL) && (mnem != 's')) || (phoneme_tab[final_ph2]->type != phVOWEL))
 							{
-								if((mnem == 's') && (phoneme_tab[final_ph2]->type == phNASAL))
-								{
-									// -ns  stress remains on penultimate syllable
-								}
-								else if(((phoneme_tab[final_ph]->type != phNASAL) && (mnem != 's')) || (phoneme_tab[final_ph2]->type != phVOWEL))
-								{
-									stressed_syllable = vowel_count - 1;
-								}
+								stressed_syllable = vowel_count - 1;
 							}
 						}
 					}
@@ -1571,6 +1577,17 @@ void SetWordStress(Translator *tr, char *output, unsigned int *dictionary_flags,
 		}
 		break;
 	}
+
+   if((stressflags & S_FINAL_VOWEL_UNSTRESSED) && ((control & 2) == 0) && (vowel_count > 2) && (max_stress_input < 3) && (vowel_stress[vowel_count - 1] == 4))
+   {
+		// Don't allow stress on a word-final vowel
+		// Only do this if there is no suffix phonemes to be added, and if a stress position was not given explicitly
+		if(phoneme_tab[final_ph]->type == phVOWEL)
+		{
+			vowel_stress[vowel_count - 1] = 1;
+			vowel_stress[vowel_count - 2] = 4;
+		}
+   }
 
 	/* now guess the complete stress pattern */
 	if(max_stress < 4)
@@ -2545,7 +2562,7 @@ static void MatchRule(Translator *tr, char *word[], char *word_start, int group_
 					total_consumed = consumed;
 				}
 
-				if((option_phonemes == 2) && (match.points > 0) && ((word_flags & FLAG_NO_TRACE) == 0))
+				if((option_phonemes & espeakPHONEMES_TRACE) && (match.points > 0) && ((word_flags & FLAG_NO_TRACE) == 0))
 				{
 					// show each rule that matches, and it's points score
 					int pts;
@@ -2562,12 +2579,6 @@ static void MatchRule(Translator *tr, char *word[], char *word_start, int group_
 
 		/* skip phoneme string to reach start of next template */
 		while(*rule++ != 0);
-	}
-
-	if((option_phonemes == 2) && ((word_flags & FLAG_NO_TRACE)==0))
-	{
-		if(group_length <= 1)
-			fprintf(f_trans,"\n");
 	}
 
 	/* advance input data pointer */
@@ -2628,7 +2639,7 @@ int TranslateRules(Translator *tr, char *p_start, char *phonemes, int ph_size, c
 	word_copy[ix] = 0;
 
 
-	if((option_phonemes == 2) && ((word_flags & FLAG_NO_TRACE)==0))
+	if((option_phonemes & espeakPHONEMES_TRACE) && ((word_flags & FLAG_NO_TRACE)==0))
 	{
 		char wordbuf[120];
 		unsigned int  ix;
@@ -2864,6 +2875,11 @@ int TranslateRules(Translator *tr, char *p_start, char *phonemes, int ph_size, c
 				// an instruction to switch language, return immediately so we can re-translate
 				strcpy(phonemes,match1.phonemes);
 				return(0);
+			}
+
+			if((option_phonemes & espeakPHONEMES_TRACE) && ((word_flags & FLAG_NO_TRACE)==0))
+			{
+					fprintf(f_trans,"\n");
 			}
 
 			match1.end_type &= ~SUFX_UNPRON;
@@ -3311,7 +3327,7 @@ static const char *LookupDict2(Translator *tr, const char *word, const char *wor
 			if(tr->expect_verb || (tr->expect_verb_s && (end_flags & FLAG_SUFX_S)))
 			{
 				// OK, we are expecting a verb
-				if((tr->translator_name == L('e','n')) && (tr->prev_dict_flags[0] & FLAG_ALT6_TRANS) && (end_flags & FLAG_SUFX_S))
+				if((tr->translator_name == L('e','n')) && (tr->prev_dict_flags[0] & FLAG_ALT7_TRANS) && (end_flags & FLAG_SUFX_S))
 				{
 					// lang=en, don't use verb form after 'to' if the word has 's' suffix
 					continue;
@@ -3362,7 +3378,7 @@ static const char *LookupDict2(Translator *tr, const char *word, const char *wor
 
 		if(phoneme_len == 0)
 		{
-			if(option_phonemes == 2)
+			if(option_phonemes & espeakPHONEMES_TRACE)
 			{
 				print_dictionary_flags(flags, dict_flags_buf, sizeof(dict_flags_buf));
 				fprintf(f_trans,"Flags:  %s  %s\n", word1, dict_flags_buf);
@@ -3373,7 +3389,7 @@ static const char *LookupDict2(Translator *tr, const char *word, const char *wor
 		if(flags != NULL)
 			flags[0] |= FLAG_FOUND;   // this flag indicates word was found in dictionary
 
-		if(option_phonemes == 2)
+		if(option_phonemes & espeakPHONEMES_TRACE)
 		{
 			char ph_decoded[N_WORD_PHONEMES];
 			int textmode;
@@ -3555,7 +3571,7 @@ int LookupDictList(Translator *tr, char **wordptr, char *ph_out, unsigned int *f
 				word1 = *wordptr;
 				*wordptr = &word_replacement[2];
 
-				if(option_phonemes == 2)
+				if(option_phonemes & espeakPHONEMES_TRACE)
 				{
 					len = found - word1;
 					memcpy(word,word1,len);   // include multiple matching words
@@ -3583,8 +3599,10 @@ int LookupDictList(Translator *tr, char **wordptr, char *ph_out, unsigned int *f
 extern char word_phonemes[N_WORD_PHONEMES];    // a word translated into phoneme codes
 
 int Lookup(Translator *tr, const char *word, char *ph_out)
-{//===================================================
-	int found;
+{//=========================================================
+// Look up in *_list, returns dictionary flags[0] and phonemes
+
+	int flags0;
 	unsigned int flags[2];
 	int say_as;
 	char *word1 = (char *)word;
@@ -3592,7 +3610,10 @@ int Lookup(Translator *tr, const char *word, char *ph_out)
 
 	flags[0] = 0;
 	flags[1] = FLAG_LOOKUP_SYMBOL;
-	found = LookupDictList(tr, &word1, ph_out, flags, FLAG_ALLOW_TEXTMODE, NULL);
+	if((flags0 = LookupDictList(tr, &word1, ph_out, flags, FLAG_ALLOW_TEXTMODE, NULL)) != 0)
+	{
+		flags0 = flags[0];
+	}
 
 	if(flags[0] & FLAG_TEXTMODE)
 	{
@@ -3600,11 +3621,11 @@ int Lookup(Translator *tr, const char *word, char *ph_out)
 		option_sayas = 0;   // don't speak replacement word as letter names
 		text[0] = 0;
 		strncpy0(&text[1], word1, sizeof(text));
-		found = TranslateWord(tr, &text[1], 0, NULL, NULL);
+		flags0 = TranslateWord(tr, &text[1], 0, NULL, NULL);
 		strcpy(ph_out, word_phonemes);
 		option_sayas = say_as;
 	}
-	return(found);
+	return(flags0);
 }
 
 
@@ -3749,7 +3770,7 @@ int RemoveEnding(Translator *tr, char *word, int end_type, char *word_copy)
 		{
 			utf8_out(tr->langopts.suffix_add_e, &word_end[1]);
 
-			if(option_phonemes == 2)
+			if(option_phonemes & espeakPHONEMES_TRACE)
 			{
 				fprintf(f_trans,"add e\n");
 			}

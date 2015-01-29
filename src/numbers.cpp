@@ -73,15 +73,15 @@ static int number_control;
 
 typedef struct {
 	const char *name;
-	int  flags;
+	int  accent_flags;   // bit 0, say before the letter name
 } ACCENTS;
 
 // these are tokens to look up in the *_list file.
 static ACCENTS accents_tab[] = {
 	{"_lig", 1},
-	{"_smc", 1},  // smallcap
-	{"_tur", 1},  // turned
-	{"_rev", 1},  // reversed
+	{"_smc", 0},  // smallcap
+	{"_tur", 0},  // turned
+	{"_rev", 0},  // reversed
 	{"_crl", 0},  // curl
 
 	{"_acu", 0},  // acute
@@ -124,11 +124,12 @@ static ACCENTS accents_tab[] = {
 #define L_EZH     70 // U+292
 #define L_GLOTTAL 71 // U+294
 #define L_RTAP    72 // U+27E
+#define L_RLONG   73 // U+27C
 
 
 static const short non_ascii_tab[] = {
 	0, 0x3b1, 0x259, 0x25b, 0x3b3, 0x3b9, 0x153, 0x3c9,
-	0x3c6, 0x283, 0x3c5, 0x292, 0x294, 0x27e
+	0x3c6, 0x283, 0x3c5, 0x292, 0x294, 0x27e, 0x27c
 };
 
 
@@ -294,6 +295,8 @@ static const unsigned short letter_accents_0e0[] = {
 	CAPITAL,
 	LETTER('z',M_CARON,0),
 	LETTER('s',M_NAME,0), // long-s  // U+17f
+//	LETTER('b',M_STROKE,0),
+
 };
 
 
@@ -341,7 +344,7 @@ static const unsigned short letter_accents_250[] = {
 	0,//LETTER(L_OMEGA,M_CLOSED,0),
 	LETTER(L_PHI,0,0),		// U+278
 	LETTER('r',M_TURNED,0),
-	0,//LETTER('r',M_TURNED,M_LEG),
+	LETTER(L_RLONG,M_TURNED,0),
 	LETTER('r',M_RETROFLEX,M_TURNED),
 	0,//LETTER('r',M_LEG,0),
 	LETTER('r',M_RETROFLEX,0),
@@ -351,7 +354,7 @@ static const unsigned short letter_accents_250[] = {
 	LETTER('r',M_TURNED,M_SMALLCAP),
 	LETTER('s',M_RETROFLEX,0),
 	0,  // esh
-	0,//LETTER('j',M_BAR,L_IMPLOSIVE),
+	LETTER('j',M_HOOK,0), //LETTER('j',M_HOOK,M_BAR),
 	LETTER(L_ESH,M_REVERSED,0),
 	LETTER(L_ESH,M_CURL,0),
 	LETTER('t',M_TURNED,0),
@@ -419,6 +422,7 @@ void LookupAccentedLetter(Translator *tr, unsigned int letter, char *ph_buf)
 	int accent_data = 0;
 	int accent1 = 0;
 	int accent2 = 0;
+	int flags1, flags2;
 	int basic_letter;
 	int letter2=0;
 	char ph_letter1[30];
@@ -456,19 +460,19 @@ void LookupAccentedLetter(Translator *tr, unsigned int letter, char *ph_buf)
 		}
 
 
-		if(Lookup(tr, accents_tab[accent1].name, ph_accent1) != 0)
+		if((flags1 = Lookup(tr, accents_tab[accent1].name, ph_accent1)) != 0)
 		{
 
 			if(LookupLetter2(tr, basic_letter, ph_letter1) != 0)
 			{
 				if(accent2 != 0)
 				{
-					if(Lookup(tr, accents_tab[accent2].name, ph_accent2) == 0)
+					if((flags2 = Lookup(tr, accents_tab[accent2].name, ph_accent2)) == 0)
 					{
 //						break;
 					}
 
-					if(accents_tab[accent2].flags & 1)
+					if(flags2 & FLAG_ACCENT_BEFORE)
 					{
 						strcpy(ph_buf,ph_accent2);
 						ph_buf += strlen(ph_buf);
@@ -485,7 +489,7 @@ void LookupAccentedLetter(Translator *tr, unsigned int letter, char *ph_buf)
 				{
 					if(accent1 == 0)
 						strcpy(ph_buf, ph_letter1);
-					else if((tr->langopts.accents & 1) || (accents_tab[accent1].flags & 1))
+					else if((tr->langopts.accents & 1) || (flags1 & FLAG_ACCENT_BEFORE) || (accents_tab[accent1].accent_flags & 1))
 						sprintf(ph_buf,"%s%c%c%s", ph_accent1, phonPAUSE_VSHORT, phonSTRESS_P, ph_letter1);
 					else
 						sprintf(ph_buf,"%c%s%c%s%c", phonSTRESS_2, ph_letter1, phonPAUSE_VSHORT, ph_accent1, phonPAUSE_VSHORT);
@@ -1684,7 +1688,18 @@ static int LookupNum2(Translator *tr, int value, int thousandplex, const int con
 						ph_tens[ix] = 0;
 				}
 			}
-			sprintf(ph_out,"%s%s%s",ph_tens, ph_digits, ph_ordinal);
+
+			if((tr->langopts.numbers2 & NUM2_ORDINAL_DROP_VOWEL) && (ph_ordinal[0] != 0))
+			{
+				ix = sprintf(ph_out,"%s%s", ph_tens, ph_digits);
+				if((ix > 0) && (phoneme_tab[(unsigned char)(ph_out[ix-1])]->type == phVOWEL))
+					ix--;
+				sprintf(&ph_out[ix], "%s", ph_ordinal);
+			}
+			else
+			{
+				sprintf(ph_out,"%s%s%s",ph_tens, ph_digits, ph_ordinal);
+			}
 		}
 	}
 

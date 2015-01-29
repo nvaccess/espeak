@@ -163,3 +163,8 @@ phoneme z.
   CALL base/z.
   ipa U+027B
 endphoneme
+
+phoneme r
+  import_phoneme base/r
+endphoneme
+
