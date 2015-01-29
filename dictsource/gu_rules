@@ -38,8 +38,8 @@
 
 .group ઇ
         ઇ          I
-//       ઇઁ        i~
-       ઇં        i~
+//       ઇઁ        In
+       ઇં        In
 
 .group ઈ
         ઈ          i:
@@ -50,8 +50,8 @@
 
 .group ઊ
         ઊ          u
-        ઊં         u~        // + anusvara
-        ઊઁ (_       u~        // + candrabinbu
+        ઊં         un        // + anusvara
+        ઊઁ (_       un        // + candrabinbu
 
 .group ઋ
         ઋ          ru
@@ -80,8 +80,8 @@
 
 .group ઓ
         ઓ          o:
-        ઓં         o~        // +anusvara
-        ઓઁ (_       o~        // +candrabindu
+        ઓં         on        // +anusvara
+        ઓઁ (_       on        // +candrabindu
     ા) ઓં (_       w        // +anusvara
     ા) ઓઁ (_       w
  
@@ -95,79 +95,98 @@
 // Vowel Signs
 
 .group ા
-        ા          a:
-        ા (ઁ       V~
-        ાઁ (_      V~
-        ાં         V~
-        ાવ         aU
+ા	#X2a:
+C)        ા          a:
+C)        ા (ઁ       V~
+C)        ાઁ (_      V~
+C)        ાં         V~
 
 .group િ
-        િ          I
-//      િઁ       i~
-      િં       i~
+િ	#X1I
+C)        િ          I
+C)//      િઁ       In
+C)      િં        In
+C)      િં (_     I~
 
 .group ી
-        ી          i:
-        ી (_       i
-        ી (ઁ       i~
-        ીઁ (_      i~
-        ીં         i~
+ી	#X2i:
+C)        ી          i:
+C)        ી (_       i
+C)        ી (ઁ       in
+C)        ીઁ (_      in
+C)        ીં         in
+C)        ીં (_      i~
 
 .group ુ
-        ુ          u
-        ુ (ઁ       u~
-        ું         u~
-        ુઁ (_      u~
+ુ	#X1U
+C)        ુ          u
+C)        ુ (ઁ       un
+C)        ુઁ (_      un
+C)        ું         un
+C)        ું (_      u~
 
 .group ૂ
-        ૂ          u:
-        ૂ (ઁ       u~
-        ૂં         u~        // or O~   ??
-        ૂઁ (_      u~
+ૂ	#X2u:
+C)        ૂ          u:
+C)        ૂ (ઁ       un
+C)        ૂઁ (_      un
+C)        ૂં         un
+C)        ૂં (_      u~        // or O~   ??
 
 .group ૃ
-        ૃ          ru
+ૃ	#X1ru
+C)        ૃ          ru
 
 .group ૄ
-        ૄ          ru
+ૄ	#X1ru
+C)        ૄ          ru
 
 .group ૅ
-        ૅ          E
+ૅ	#X1E
+C)        ૅ          E
 
 .group ે
-        ે          e:
-        ે (ઁ       e~
-        ેં         e~:
-        ેઁ (_      e~:
+ે	#X2e:
+C)        ે          e:
+C)        ે (ઁ       e~
+C)        ેં         e~:
+C)        ેઁ (_      e~:
 
 .group ૈ
-        ૈ           aI        // ?? [aI] [E:] [&:]
-        ૈં         aI~
-        ૈ (ઁ       aI~ 
-        ૈઁ (_      aI~
+ૈ	#X2aI
+C)        ૈ           aI        // ?? [aI] [E:] [&:]
+C)        ૈં         aI~
+C)        ૈ (ઁ       aI~ 
+C)        ૈઁ (_      aI~
 
 
 .group ૉ
-        ૉ          O
+ૉ	#X1O
+C)        ૉ          O
 
 .group ો
-        ો          o:
-        ોં         o~
-        ો (ઁ       o~
-        ોઁ (_      o~
+ો	#X2o:
+C)        ો          o:
+C)        ોં         on
+C)        ોં (_      o~
+C)        ો (ઁ       on
+C)        ોઁ (_      on
 
 .group ૌ
-        ૌ          aU        //  [O:] or [aU] ??
-        ૌ (ઁ       aU~        //  [O:] or [aU] ??
-        ૌં         aU~
-        ૌઁ (_      aU~
+ૌ	#X2aU
+C)        ૌ          aU        //  [O:] or [aU] ??
+C)        ૌ (ઁ       aU~        //  [O:] or [aU] ??
+C)        ૌં         aU~
+C)        ૌઁ (_      aU~
 
 
 .group ૢ     // vowel sign l
-        ૢ          l-
+ૢ 	#X1l-
+C)        ૢ          l-
 
 .group ૣ    // vowel sign ll
-        ૣ          l-:
+ૣ	#X2l-:
+C)        ૣ          l-:
 
 .group ૐ
         ૐ          o~m
@@ -227,9 +246,6 @@
         છ          c#V
         છ (B       c#
 
-        છ્છ         c#:V   // c#c# -> c#:
-        છ્છ (B      c#:
-
 .group જ
         જ          JV
         જ (B       J
@@ -242,9 +258,9 @@
         જ્ઞ          gn.V
         જ્ઞ (B       gn.
 
-.group ઝ
-        ઝ          J#V
-        ઝ (B       J#
+.group ઝ  // According to chart this is jha ( ઝ 0A9D)but it is told that it looks like za ( જ઼ 0A9C + 0ABC) 
+        ઝ          zV
+        ઝ (B       z
 
 .group ઞ
         ઞ          n^V
@@ -266,8 +282,6 @@
         ઠ          t.#V
         ઠ (B       t.#
 
-        ઠ્ઠ          t.#:V   // t.#t.# -> t.#:
-        ઠ્ઠ (B       t.#:
 
 .group ડ
         ડ          d.V
@@ -285,9 +299,6 @@
 .group ઢ
         ઢ          d.#V
         ઢ (B       d.#
-
-        ઢ્ઢ         d.#:V   // d.#d.# -> d.#:
-        ઢ્ઢ (B      d.#:
 
         ઢ઼         r.hV      // nukta  (should retroflex flap)
         ઢ઼ (B      r.h       // nukta
@@ -313,8 +324,6 @@
         થ          t#V
         થ (B       t#
 
-        થ્થ         t#:V   // t#t# -> t#:
-        થ્થ (B      t#:
 
 .group દ
         દ          dV
@@ -329,9 +338,6 @@
 .group ધ
         ધ          d#V
         ધ (B       d#
-
-        ધ્ધ         d#:V   // d#d# -> d#:
-        ધ્ધ (B      d#:
 
 .group ન
         ન          nV
@@ -386,10 +392,10 @@
         લ (B       l
      ્) લ (_       l@
 
-.group ળ
-        ળ          l.V
-        ળ (B       l.
-     ્) ળ (_       l.@
+.group ળ    // According to chart this is lla ( ળ 0AB3)but it is told that it looks like adda ( ડ઼ 0AA1 + 0ABC) 
+        ળ          r.V
+        ળ (B       r.
+     ્) ળ (_       r.@
 
 .group વ
         વ          vV
@@ -457,7 +463,9 @@
         ઃ          H         //  visarga
 
 .group ્		// virama
-્ 
+્	k#'o:d.
+C)	્ 
+
 
 // Extra consonants
 

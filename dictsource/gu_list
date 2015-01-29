@@ -1,4 +1,4 @@
-﻿// This gu_rules file is prepared by Maheshinder Singh Khosla< mahesh.khosla@gmail.com >.
+﻿// This gu_list file is prepared by Maheshinder Singh Khosla< mahesh.khosla@gmail.com >.
 
 // This file is UTF8 encoded
 
@@ -25,7 +25,7 @@ _14        c'O:d
 _15        p@nd'Vr
 _16         s'o:r.
 _17        s@tt'Vr
-_18          Vd.#'@r
+_18          'Vd.#a:r
 _19        ,o:gn.'i:s
 
 _20        w'i:s
@@ -103,7 +103,7 @@ _85        pInc'a:si
 _86        c#e:'V~si
 _87        s@t:j'a:si
 _88        ,Vt.#j'a:si
-_89        nIvj'a:si
+_89         ne:vj'a:Si
 
 _90       n'e:vu~
 _91       e:k'a:n.u~
@@ -139,7 +139,7 @@ _dpt      _d@s@ml'o:_
 છ      ch@
 જ      J@
 જ઼      z@
-ઝ      Jh@
+ઝ      z@
 ઞ      n^@
 ટ      t.@
 ઠ      t.#@
@@ -162,7 +162,7 @@ _dpt      _d@s@ml'o:_
 ર      r@
 
 લ      l@
-ળ      l.@
+ળ      @r.@   // According to chart this is lla ( ળ 0AB3)but it is told that it looks like adda ( ડ઼ 0AA1 + 0ABC) 
 વ      v@
 શ      S@
 ષ      s.@   //  retroflex [S]
@@ -170,30 +170,25 @@ _dpt      _d@s@ml'o:_
 હ      H@
 
 // combining vowel signs
-ા	#X2a:
-િ	#X1I
-ી	#X2i:
-ુ	#X1U
-ૂ	#X2u:
-ૃ	#X1ru
-ૄ	#X1ru
-ૅ	#X1E
-ે	#X2e:
-ૈ	#X2aI
 ?2 ૈ	#X2aI
-ૉ	#X1O
-ો	#X2o:
-ૌ	#X2aU
 ?3 ૌ 	#X2aU
-ૢ 	#X1l-
-ૣ	#X2l-:
-ૐ	#X1o~m
+
+
+// Symbols
+ઁ	c'Vndr@-b'IndU
+ં	 Vn'Usv@r
+ઃ	 wIs'VRg
+઼	 n'Ukt,a:
+ऽ	 Vv'Vgr@2H
+॑	 Ud'a:t
+॒	 'VnUdata:
+
 
 
 // Punctuation
 ।	dVn.d.V
-્	H@l'Vnt
-$	dOl@r
+
+ $	dOl@r
 %	pVt'IS@t
 +	plVs
 =	bVr'a:b@r

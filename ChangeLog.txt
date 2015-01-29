@@ -2,7 +2,7 @@ espeak 1.48.04  06.04.2014
 
 Corrections to languages en, nl, ta (rules, list, and dict files).
 No other changes from version 1.48.03. No change to program, phoneme
-data, or other languages.
+data, espeakedit, or other languages.
 
 
 espeak 1.48.03  04.04.2014

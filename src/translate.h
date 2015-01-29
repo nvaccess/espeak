@@ -44,6 +44,7 @@
 #define FLAG_STRESS_END2     0x400  // full stress if at end of clause, or only followed by unstressed
 #define FLAG_UNSTRESS_END    0x800  // reduce stress at end of clause
 #define FLAG_SPELLWORD      0x1000  // re-translate the word as individual letters, separated by spaces
+#define FLAG_ACCENT_BEFORE  0x1000  // say this accent name before the letter name
 #define FLAG_ABBREV         0x2000  // spell as letters, even with a vowel, OR use specified pronunciation rather than split into letters
 #define FLAG_DOUBLING       0x4000  // doubles the following consonant
 
@@ -54,6 +55,7 @@
 #define FLAG_ALT4_TRANS    0x40000  // language specific
 #define FLAG_ALT5_TRANS    0x80000  // language specific
 #define FLAG_ALT6_TRANS   0x100000  // language specific
+#define FLAG_ALT7_TRANS   0x200000  // language specific
 
 #define FLAG_COMBINE      0x800000  // combine with the next word
 #define FLAG_ALLOW_DOT  0x01000000  // ignore '.' after word (abbreviation)
@@ -406,8 +408,8 @@ typedef struct {
 #define S_FIRST_PRIMARY     0x80
 // bit7=if more than one primary stress, make the subsequent primaries to secondary stress
 
-#define S_FINAL_STRESS_C    0x100
-// bit8=stress last syllable if it doesn't end in a vowel
+#define S_FINAL_VOWEL_UNSTRESSED    0x100
+// bit8=don't apply default stress to a word-final vowel
 
 #define S_FINAL_SPANISH     0x200
 // bit9=stress last syllable if it doesn't end in vowel or "s" or "n"  LANG=Spanish
@@ -524,6 +526,7 @@ typedef struct {
 #define NUM2_PERCENT_BEFORE     0x10000
 #define NUM2_OMIT_1_HUNDRED_ONLY 0x20000
 #define NUM2_ORDINAL_AND_THOUSANDS 0x40000
+#define NUM2_ORDINAL_DROP_VOWEL  0x80000        // currently only for tens and units
 	// bits 1-4  use variant form of numbers before thousands,millions,etc.
 	// bits 6-8  use different forms of thousand, million, etc (M MA MB)
 	// bit9=(LANG=rw) say "thousand" and "million" before its number, not after
@@ -535,6 +538,7 @@ typedef struct {
 	// bit16=(LANG=si)  say "%" before the number
 	// bit17=(LANG=ml)  omit "one" before hundred only if there are no previous digits
 	// bit18=(LANG=ta)  same variant for ordinals and thousands (#o = #a)
+	// bit19=(LANG=te)  drop final vowel from cardial number before adding ordinal suffix
 	int numbers2;
 
 #define BREAK_THOUSANDS   0x49249248
@@ -669,7 +673,6 @@ extern int option_tone_flags;
 extern int option_waveout;
 extern int option_quiet;
 extern int option_phonemes;
-extern int option_mbrola_phonemes;
 extern int option_phoneme_events;
 extern int option_linelength;     // treat lines shorter than this as end-of-clause
 extern int option_multibyte;

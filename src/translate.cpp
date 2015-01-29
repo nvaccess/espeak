@@ -763,7 +763,7 @@ int ChangeEquivalentPhonemes(Translator *tr, int lang2, char *phonemes)
 	}
 	remove_stress = pb[1];
 
-	if(option_phonemes == 2)
+	if(option_phonemes & espeakPHONEMES_TRACE)
 	{
 		DecodePhonemes(phonemes, phonbuf);
 		fprintf(f_trans,"(%s) %s  -> (%s) ", phoneme_tab_list[lang2].name, phonbuf, phoneme_tab_list[tr->phoneme_tab_ix].name);
@@ -806,7 +806,7 @@ int ChangeEquivalentPhonemes(Translator *tr, int lang2, char *phonemes)
 
 	strcpy(phonemes, phonbuf);
 
-	if(option_phonemes == 2)
+	if(option_phonemes & espeakPHONEMES_TRACE)
 	{
 		SelectPhonemeTable(tr->phoneme_tab_ix);
 		DecodePhonemes(phonemes, phonbuf);
@@ -861,6 +861,7 @@ int TranslateWord(Translator *tr, char *word_start, int next_pause, WORD_TAB *wt
 	int wmark;
 	int was_unpronouncable = 0;
 	int loopcount;
+	int add_suffix_phonemes = 0;
 	WORD_TAB wtab_null[8];
 
 	// translate these to get pronunciations of plural 's' suffix (different forms depending on
@@ -949,7 +950,7 @@ int TranslateWord(Translator *tr, char *word_start, int next_pause, WORD_TAB *wt
 			found = LookupDictList(tr, &word1, phonemes, dictionary_flags, FLAG_ALLOW_TEXTMODE, wtab);   // the original word
 
 
-		if((dictionary_flags[0] & (FLAG_ALLOW_DOT || FLAG_NEEDS_DOT)) && (wordx[1] == '.'))
+		if((dictionary_flags[0] & (FLAG_ALLOW_DOT | FLAG_NEEDS_DOT)) && (wordx[1] == '.'))
 		{
 			wordx[1] = ' ';   // remove a Dot after this word
 		}
@@ -1220,7 +1221,7 @@ if(end_type & SUFX_UNPRON)
 							end_type = end2;
 							strcpy(phonemes,phonemes2);
 							strcpy(end_phonemes,end_phonemes2);
-							if(option_phonemes == 2)
+							if(option_phonemes & espeakPHONEMES_TRACE)
 							{
 								DecodePhonemes(end_phonemes,end_phonemes2);
 								fprintf(f_trans,"  suffix [%s]\n\n",end_phonemes2);
@@ -1465,6 +1466,12 @@ if(end_type & SUFX_UNPRON)
 
 	/* determine stress pattern for this word */
 	/******************************************/
+	add_suffix_phonemes = 0;
+	if(end_phonemes[0] != 0)
+	{
+		add_suffix_phonemes = 2;
+	}
+
 	prefix_stress = 0;
 	for(p = prefix_phonemes; *p != 0; p++)
 	{
@@ -1516,9 +1523,9 @@ if(end_type & SUFX_UNPRON)
 	else
 	{
 		if(prefix_phonemes[0] == 0)
-			SetWordStress(tr, phonemes, dictionary_flags, -1, 0);
+			SetWordStress(tr, phonemes, dictionary_flags, -1, add_suffix_phonemes);
 		else
-			SetWordStress(tr, phonemes, dictionary_flags, -1, 0);
+			SetWordStress(tr, phonemes, dictionary_flags, -1, add_suffix_phonemes);
 #ifdef PLATFORM_WINDOWS
 		sprintf(word_phonemes, "%s%s%s", unpron_phonemes, prefix_phonemes, phonemes);
 #else
@@ -2070,7 +2077,7 @@ static int TranslateWord2(Translator *tr, char *word, WORD_TAB *wtab, int pre_pa
 				if(pre_pause < 1)
 					pre_pause = 1;
 			}
-			if((flags & FLAG_PREPAUSE) && !(word_flags && (FLAG_LAST_WORD | FLAG_FIRST_WORD)) && !(wtab[-1].flags & FLAG_FIRST_WORD) && (tr->prepause_timeout == 0))
+			if((flags & FLAG_PREPAUSE) && !(word_flags & (FLAG_LAST_WORD | FLAG_FIRST_WORD)) && !(wtab[-1].flags & FLAG_FIRST_WORD) && (tr->prepause_timeout == 0))
 			{
 				// the word is marked in the dictionary list with $pause
 				if(pre_pause < 4) pre_pause = 4;

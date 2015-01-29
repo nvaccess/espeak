@@ -606,7 +606,8 @@ endphoneme
 phoneme w
   liquid
   lengthmod 7
-
+  starttype #u
+  
   IF nextPh(isVowel) THEN
     NextVowelStarts
       VowelStart(w/w@)
@@ -621,6 +622,8 @@ phoneme w
 
     IF prevPhW(isNasal) THEN
       FMT(w/w)
+    ELSEIF prevPhW(h) THEN
+      // none,  [hw]
     ELSE
       FMT(w/_w)
     ENDIF
@@ -633,6 +636,7 @@ phoneme w
     FMT(w/w_)
   ENDIF
 endphoneme
+
 
 
 
@@ -1709,6 +1713,9 @@ include ph_german
 phonemetable eo base
 include ph_esperanto
 
+phonemetable ia eo
+include ph_interlingua
+
 phonemetable jbo eo
 include ph_lojban
 
@@ -1731,29 +1738,38 @@ phonemetable nl base
 include ph_dutch
 
 
-phonemetable hi base
+phonemetable hi_base base
+include ph_hindi_base
+
+phonemetable hi hi_base
 include ph_hindi
 
-phonemetable bn hi
+phonemetable bn hi_base
 include ph_bengali
 
-phonemetable ne hi
+phonemetable ne hi_base
 include ph_nepali
 
-phonemetable ur hi
+phonemetable ur hi_base
 include ph_urdu
 
-phonemetable pa hi
+phonemetable pa hi_base
 include ph_punjabi
 
-phonemetable ta hi
+phonemetable ta hi_base
 include ph_tamil
 
-phonemetable kn hi
+phonemetable kn hi_base
 include ph_kannada
 
-phonemetable ml hi
+phonemetable ml hi_base
 include ph_malayalam
+
+phonemetable gu hi_base
+include ph_gujarati
+
+phonemetable mr hi_base
+include ph_marathi
 
 
 
@@ -1809,6 +1825,9 @@ include ph_catalan
 
 phonemetable an es
 include ph_aragon
+
+phonemetable eu base2
+include ph_basque
 
 phonemetable pt base2
 include ph_pt_brazil
@@ -1877,6 +1896,9 @@ include ph_georgian
 phonemetable fa base
 include ph_farsi
 
+phonemetable ar base
+include ph_arabic
+
 
 //**************************************************************************************
 // The following lines are experimental, for future additions.
@@ -1885,12 +1907,6 @@ include ph_farsi
 
 phonemetable rw base2
 include ph_kinyarwanda
-
-//phonemetable mr hi
-//include ph_marathi
-
-//phonemetable eu base2
-//include ph_basque
 
 //phonemetable mn base
 //include ph_mongolian
@@ -1922,17 +1938,14 @@ include ph_amhari
 phonemetable wo base
 include ph_wolof
 
-phonemetable dv hi
+phonemetable dv hi_base
 include ph_divehi
 
-phonemetable te hi
+phonemetable te hi_base
 include ph_telugu
 
-phonemetable si hi
+phonemetable si hi_base
 include ph_sinhala
-
-phonemetable gu hi
-include ph_gujarati
 
 phonemetable as bn
 include ph_assamese
@@ -1967,9 +1980,7 @@ include ph_korean
 phonemetable kl base
 include ph_greenlandic
 
-phonemetable eu base2
-include ph_basque
 
-
-//phonemetable en2 en
+//phonemetable en-test base
 //include ph_english_test
+
