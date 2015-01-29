@@ -7,3 +7,4 @@ phsource/compile_*
 phsource/envelopes.png
 phsource/error_*
 phsource/vowelcharts
+phsource/*/*.png
